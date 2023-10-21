@@ -1,0 +1,486 @@
+---
+title: "Homework 3: Some of my Best Friends are Zombies"
+author: "Angelique J. Lindberg"
+date: "`r Sys.Date()`"
+output: rmdformats::readthedown
+---
+
+```{r packages needed, include=FALSE}
+library(curl) #here are the packages needed for this assignment
+library(ggplot2)
+library(dplyr)
+```
+
+![Disco Zombie from Plants v. Zombies](https://static.wikia.nocookie.net/plantsvszombies/images/9/9c/HD_Disco_Zombie.png/revision/latest?cb=20221012142405)
+
+## Background
+
+In order to play with same data, we first need to load the data.
+```{r}
+f<-curl(url = "https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN588_Fall23/zombies.csv")
+z<-read.csv(f, header=TRUE, sep = ",", stringsAsFactors = TRUE) 
+```
+
+What we've loaded is a dataset including the first name, last name, and gender of the entire population of 1000 people who have survived the zombie apocalypse and are now ekeing out an existence somewhere on the East Coast, along with several other variables (height, weight, age, number of years of education, number of zombies they have killed, and college major). 
+
+## Question 1
+Calculate the population mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education).
+
+We're going to calculate means first.
+Mean of height:
+```{r}
+h<-z$height
+mean(h)
+```
+Mean of weight:
+```{r}
+w<-z$weight
+mean(w)
+```
+Mean of age:
+```{r}
+a<-z$age
+mean(a)
+```
+Mean number of zombies killed:
+```{r}
+zk<-z$zombies_killed
+mean(zk)
+```
+Mean years of education:
+```{r}
+e<-z$years_of_education
+mean(e)
+```
+
+For standard deviation, we're going to write an equation.
+SD=square root of variance
+variance=sum of squares/n
+sum of squares=the sum of the squared deviations of a set of values from the mean
+So, going to start with a sum of squares equation and build up from there.
+```{r}
+ss<-function(x){
+  sum(x^2) - (sum(x))^2/length(x)
+}
+```
+Now, variance equation:
+```{r}
+v<-function(x){
+  ss(x)/length(x)
+}
+```
+Finally, standard deviation equation
+```{r}
+sdf<-function(x){
+  sqrt(v(x))
+}
+```
+
+Now, let's calculate the standard deviations. 
+SD of height:
+```{r}
+sdf(h)
+```
+SD of weight:
+```{r}
+sdf(w)
+```
+SD of age:
+```{r}
+sdf(a)
+```
+SD of number of zombies killed:
+```{r}
+sdf(zk)
+```
+SD of number of years of education:
+```{r}
+sdf(e)
+```
+
+## Question 2
+Use {ggplot} to make boxplots of each of these variables by gender.
+
+Age boxplot:
+```{r}
+ggplot(data = z) + geom_boxplot(aes(x = gender, y = a)) + ylab("Age") + ggtitle("Age of Survivors by Gender")
+```
+
+Height boxplot:
+```{r}
+ggplot(data = z) + geom_boxplot(aes(x = gender, y = h)) + ylab("Height") + ggtitle("Height of Survivors by Gender")
+```
+
+Weight boxplot:
+```{r}
+ggplot(data = z) + geom_boxplot(aes(x = gender, y = w)) + ylab("Weight") + ggtitle("Weight of Survivors by Gender")
+```
+
+Number of zombies killed boxplot:
+```{r}
+ggplot(data = z) + geom_boxplot(aes(x = gender, y = zk)) + ylab("Number of Zombies Killed") + ggtitle("Number of Zombies Killed by Gender")
+```
+
+Years of education boxplot:
+```{r}
+ggplot(data = z) + geom_boxplot(aes(x = gender, y = e)) + ylab("Years of Education") + ggtitle("Years of Education by Gender")
+```
+
+## Question 3
+
+Part 1: Use {ggplot} to make scatterplots of height and weight in relation to age.
+
+Height by age:
+```{r}
+ggplot(data = z) + geom_point(aes(x = age, y = height)) + ggtitle("Height of Survivors by Age")
+```
+
+Weight by age:
+```{r}
+ggplot(data = z) + geom_point(aes(x = age, y = weight)) + ggtitle("Weight of Survivors by Age")
+```
+
+
+
+Part 2: Do these variables seem to be related? In what way?
+
+Weight and age do not seem to be relates significantly as the points are pretty scattered with little cluster. There does seem to be a slight positive association in which higher weights are associates with older individuals. 
+Height and age also has a lot of scatter but has a tighter association. It suggests that height increases with higher age, which makes sense as the ages are between 10 and 30, thus growth is a factor. 
+
+## Question 4
+Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution. Which seem to be and which do not (hint: not all are drawn from the normal distribution)? For those that are not normal, can you determine from which common distribution they are drawn?
+
+Is age normal? 
+Q-Q plot
+```{r}
+qqnorm(a, main = "Age of survivors")
+qqline(a)
+```
+Histogram
+```{r}
+hist(a, main= "Age of Survivors", xlab = "Age")
+```
+Based on the Q-Q plot and histogram, age appears normal. 
+
+Is height normal?
+Q-Q plot
+```{r}
+qqnorm(h, main = "Height of Survivors")
+qqline(h)
+```
+Histogram
+```{r}
+hist(h, main= "Height of Survivors", xlab = "Height")
+```
+
+Height also seems normal. 
+
+Is weight normal?
+Q-Q plot
+```{r}
+qqnorm(w, main = "Weight of survivors")
+qqline(w)
+```
+Histogram
+```{r}
+hist(w, main= "Weight of Survivors", xlab = "Weight")
+```
+Weight seems close to normally distributed, though there is a slight skew towards heavier weights. 
+
+Is the number of zombies killed normally distributed?
+Q-Q plot
+```{r}
+qqnorm(zk, main = "Number of zombies killed by survivors")
+qqline(zk)
+```
+Histogram
+```{r}
+hist(a, main= "Number of zombies killed by survivors", xlab = "Number of zombies killed")
+```
+This Q-Q plot does not look normally distributed. This could be a poisson distribution as it's a count. 
+
+Is years of education normally distributed?
+Q-Q plot
+```{r}
+qqnorm(e, main = "Survivors' Years of Education")
+qqline(e)
+```
+Histogram
+```{r}
+hist(e, main= "Survivors' Years of Education", xlab = "Years of Education")
+```
+Years of education does not look normally distributed in either Q-Q plot or histogram. I think this might also be a poisson distribution since the Q-Q plot looks like the previous.  
+
+## Question 5
+Now use the sample() function to sample ONE subset of 30 zombie survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable. Also estimate the standard error for each variable, and construct the 95% confidence interval for each mean. Note that for the variables that are not drawn from the normal distribution, you may need to base your estimate of the CIs on slightly different code than for the normal…
+
+
+First, create the sample
+```{r}
+n<-30
+set.seed(923)
+sam1<-sample_n(z, size = n, replace = FALSE) #had to use sample_n to make this work
+```
+
+Then, calculate means for each variable
+Sample age mean
+```{r}
+mean(sam1$age)
+```
+Sample height mean
+```{r}
+mean(sam1$height)
+```
+Sample weight mean
+```{r}
+mean(sam1$weight)
+```
+Sample number of zombies killed mean
+```{r}
+mean(sam1$zombies_killed)
+```
+Sample years of education mean
+```{r}
+mean(sam1$years_of_education)
+```
+
+And calculate standard deviations 
+I'm gonna use sd() since this is a sample
+Sd of sample age
+```{r}
+sd(sam1$age)
+```
+sd of sample height
+```{r}
+sd(sam1$height)
+```
+sd of sample weight
+```{r}
+sd(sam1$weight)
+```
+sd of sample's number of zombies killed
+```{r}
+sd(sam1$zombies_killed)
+```
+sd of sample's years of educations
+```{r}
+sd(sam1$years_of_education)
+```
+
+To estimate standard error for each variable:
+ sample standard deviation / (square root of the sample size)
+ 
+Sample age standard error
+```{r}
+sd(sam1$age)/sqrt(n)
+```
+Sample height standard error
+```{r}
+sd(sam1$height)/sqrt(n)
+```
+Sample weight standard error
+```{r}
+sd(sam1$weight)/sqrt(n)
+```
+Sample number of zombies killed standard error
+```{r}
+sd(sam1$zombies_killed)/sqrt(n)
+```
+Sample's years of education standard error
+```{r}
+sd(sam1$years_of_education)/sqrt(n)
+```
+
+Lastly, confidence intervals:
+
+Sample Age confidence interval
+```{r}
+am<-mean(sam1$age)
+asd<-sd(sam1$age)
+aupper <- am + qnorm(0.975, mean = am, sd = asd) * (sd(sam1$age)/sqrt(n)) #qnorm because age was normally distributed
+alower <- am + qnorm(0.025, mean = am, sd = asd) * (sd(sam1$age)/sqrt(n))
+aci <- c(alower, aupper)
+aci
+```
+Sample height confidence interval
+```{r}
+hm<-mean(sam1$height)
+hsd<-sd(sam1$height)
+hupper <- hm + qnorm(0.975, mean = hm, sd = hsd) * (sd(sam1$height)/sqrt(n)) #qnorm because height was normally distributed
+hlower <- hm + qnorm(0.025, mean = hm, sd = hsd) * (sd(sam1$height)/sqrt(n))
+hci <- c(hlower, hupper)
+hci
+```
+Sample weight confidence interval
+```{r}
+wm<-mean(sam1$weight)
+wsd<-sd(sam1$weight)
+wupper <- wm + qnorm(0.975, mean = wm, sd = wsd) * (sd(sam1$weight)/sqrt(n)) #qnorm because weight was normally distributed
+wlower <- wm + qnorm(0.025, mean = wm, sd = wsd) * (sd(sam1$weight)/sqrt(n))
+wci <- c(wlower, wupper)
+wci
+```
+Sample number of zombies killed confidence interval
+```{r}
+zkm<-mean(sam1$zombies_killed) 
+zkupper <- zkm + qpois(0.975, lambda = zkm, lower.tail = TRUE) * (sd(sam1$zombies_killed)/sqrt(n)) #qpois because zombies killed was a poisson distribution #lambda is same as mean
+zklower <- zkm + qpois(0.025, lambda = zkm, lower.tail = TRUE) * (sd(sam1$zombies_killed)/sqrt(n))
+zkci <- c(zklower, zkupper)
+zkci
+```
+Sample's years of education confidence interval
+```{r}
+em<-mean(sam1$years_of_education) 
+eupper <- em + qpois(0.975, lambda = em, lower.tail = TRUE) * (sd(sam1$years_of_education)/sqrt(n)) #qpois because years of education  was a poisson distribution #lambda is same as mean
+elower <- em + qpois(0.025, lambda = em, lower.tail = TRUE) * (sd(sam1$years_of_education)/sqrt(n))
+eci <- c(elower, eupper)
+eci
+```
+ 
+
+## Question 6
+Now draw 99 more random samples of 30 zombie apocalypse survivors, and calculate the mean for each variable for each of these samples. Together with the first sample you drew, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a sampling distribution for each variable. What are the means and standard deviations of this distribution of means for each variable? How do the standard deviations of means compare to the standard errors estimated in [5]? What do these sampling distributions look like (a graph might help here)? Are they normally distributed? What about for those variables that you concluded were not originally drawn from a normal distribution?
+
+Age 100 sample means
+```{r}
+k <- 99 # number of samples
+n2 <- 30 # size of each sample
+meansage<-NULL
+set.seed(923)
+for (i in 1:k) {
+  meansage[[i]]<-mean(sample(z$age, size=n2,replace = FALSE))
+}
+meansage[[length(meansage)+1]] = (mean(sam1$age)) #adding first sample mean
+meansage
+```
+
+Age means mean
+```{r}
+mean(unlist(meansage)) #had to use unlist to get mean of list
+```
+Heights mean standard deviation
+```{r}
+sd(unlist(meansage))
+```
+Standard error from Question 5 was about 0.51 so that's very close to this answer.
+
+```{r}
+hist(unlist(meansage), main = "Histogram of 100 Samples' Mean Ages", xlab = "Means")
+```
+This distribution does not look very normal, mostly because both tails have peaks higher than the middle.
+
+
+Height 100 sample means
+```{r}
+k <- 99 # number of samples
+n2 <- 30 # size of each sample
+meanheights<-NULL
+set.seed(923)
+for (i in 1:k) {
+  meanheights[[i]]<-mean(sample(z$height, size=n2,replace = FALSE))
+}
+meanheights[[length(meanheights)+1]] = (mean(sam1$height)) #adding first sample mean
+meanheights
+```
+
+Height means mean
+```{r}
+mean(unlist(meanheights)) #had to use unlist to get mean of list
+```
+Heights mean standard deviation
+```{r}
+sd(unlist(meanheights))
+```
+Standard error from Question 5 was about 0.8 so that's basically equivalent to this answer.
+
+```{r}
+hist(unlist(meanheights), main = "Histogram of 100 Samples' Mean Heights", xlab = "Means")
+```
+This distribution is close to normal, though the right tail is more skewed and not as standardized.
+
+Weight 100 sample means
+```{r}
+k <- 99 # number of samples
+n2 <- 30 # size of each sample
+meansweight<-NULL
+set.seed(923)
+for (i in 1:k) {
+  meansweight[[i]]<-mean(sample(z$weight, size=n2,replace = FALSE))
+}
+meansweight[[length(meansweight)+1]] = (mean(sam1$weight)) #adding first sample mean
+meansweight
+```
+
+Weight means mean
+```{r}
+mean(unlist(meansweight)) #had to use unlist to get mean of list
+```
+Weights mean standard deviation
+```{r}
+sd(unlist(meansweight))
+```
+Standard error from Question 5 was about 3.23 so that's very close to this answer.
+
+```{r}
+hist(unlist(meansweight), main = "Histogram of 100 Samples' Mean Weights", xlab = "Means")
+```
+This distribution is close to normal, though the right tail is lacking some frequencies to have a normal curve.
+
+Zombies killed 100 sample means
+```{r}
+k <- 99 # number of samples
+n2 <- 30 # size of each sample
+meanszk<-NULL
+set.seed(923)
+for (i in 1:k) {
+  meanszk[[i]]<-mean(sample(z$zombies_killed, size=n2,replace = FALSE))
+}
+meanszk[[length(meanszk)+1]] = (mean(sam1$zombies_killed)) #adding first sample mean
+meanszk
+```
+
+Zombies killed means mean
+```{r}
+mean(unlist(meanszk)) #had to use unlist to get mean of list
+```
+zombies killed mean standard deviation
+```{r}
+sd(unlist(meanszk))
+```
+Standard error from Question 5 was about 0.3 so that's basically equivalent to this answer.
+
+```{r}
+hist(unlist(meanszk), main = "Histogram of 100 Samples' Mean Number of Zombies Killed", xlab = "Means")
+```
+This distribution is close to normal.
+
+Years of education 100 sample means
+```{r}
+k <- 99 # number of samples
+n2 <- 30 # size of each sample
+meansedu<-NULL
+set.seed(923)
+for (i in 1:k) {
+  meansedu[[i]]<-mean(sample(z$years_of_education, size=n2,replace = FALSE))
+}
+meansedu[[length(meansedu)+1]] = (mean(sam1$years_of_education)) #adding first sample mean
+meansedu
+```
+
+Years of education means mean
+```{r}
+mean(unlist(meansedu)) #had to use unlist to get mean of list
+```
+Heights mean standard deviation
+```{r}
+sd(unlist(meansedu))
+```
+Standard error from Question 5 was about 0.32 so that's close but a little off from this answer.
+
+```{r}
+hist(unlist(meansedu), main = "Histogram of 100 Samples' Mean Years of education", xlab = "Means")
+```
+This distribution is close to normal, though the highest frequency is quite high.
+
+## Reflection
+I learned a lot from this assignment and peer reflection. I think I learn the most from giving commentary, rather than receiving. I was able to offer my help with some of my peer's issues. One cool thing was that I had to troubleshoot transitioing her linked images and data so that it would knit on my computer but I ended up using a combination of my usual method and hers. I learned a bunch of new tricks to try including putting warning=FALSE for packages so that all the annoying stuff doesn't show up in the knit. I also noted ggarrange(), bind_rows(), and some cool use of tidyverse verbs like list() and reduce().   
